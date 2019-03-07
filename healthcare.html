@@ -1,0 +1,384 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- D3 tip CSS -->
+    <link rel="stylesheet" href="css/d3-tip.css">
+
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/health.css">
+	<script type = "text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type = "text/javascript">
+	/* The purpose of this project is to learn about data Visualization and present information in visual manners
+	
+	*/
+	
+	google.charts.load('current' ,{'packages' : ['corechart']});
+	google.charts.setOnLoadCallback(drawAllSheets);
+	
+	function drawAllSheets() {
+		drawSheetName('Top10Health','SELECT A,B,C,D,E,F,G',
+	                 TopHealthResponseHandler);	
+		drawSheetName('Top10Health', 'SELECT A,B,C,D,E,F,G',
+	                   TopHealthStackResponseHandler);
+		drawSheetName('Top10Health','SELECT A,G',
+	                 HealthGeoResponseHandler);	
+		drawSheetName('Top10Health', 'SELECT A,G',
+                      HealthPieResponseHandler);
+		drawSheetName('Healthcare10GDP' ,'SELECT A,G,P',
+                        CompareTrendHealthGDPResponseHandler);	
+		drawSheetName('Healthcare10GDP', 'SELECT A,G,P',
+	                     CompareHealthcareGDPResponseHandler);	
+		drawSheetName('HealthMilitary10', 'SELECT A,G,Q',
+	                     CompareHealthMilitaryResponseHandler);
+		drawSheetName('PercapitaHealthGdp', 'SELECT A,G,X',
+	                     ComparePercapitaHealthGdpResponseHandler);
+		drawSheetName('FastHealth','SELECT A,B,C,D,E,F,G,H,I,J,K',
+	              FastestHealthFixedValueResponseHandler);
+		drawSheetName('FastHealth',' SELECT M,N,O,P,Q,R,S,T,U,V,W',
+	               FastestHealthPercentValueResponseHandler);
+		
+	}
+	function drawSheetName(sheetName, query, responseHandler) {
+	var queryString = encodeURIComponent(query);
+	var query = new google.visualization.Query(
+              'https://docs.google.com/spreadsheets/d/1vkzDvA31IR-nHbgvUhIoSVqfih_9XhFYCbRVXduMcKA/gviz/tq?sheet='
+			   + sheetName + '&headers=1&tq=' + queryString);
+	       query.send(responseHandler);
+	}
+	
+	function checkError(response) {
+	if(response.isError()) {
+	alert('Error in query: '+ response.getMessage() +
+	' ' + response.getDetailedMessage());
+	return;
+	}
+	}
+	//Function end
+		//Health care spending of top 10 Countries for 6 years of data using column chart
+function TopHealthResponseHandler(response) {
+	
+     checkError(response);
+	 var data = response.getDataTable();
+	 data.sort({column:6, desc:true});
+	 
+	 var options ={
+	 title :' Top 10 Countries with highest Healthcare spending',
+	  height: 500,
+	  vAxis: {title: 'Spending in Billions USD ($)'},
+	  hAxis: {title:  'Country'}
+	 
+	 };
+	 
+	 var chart = new google.visualization.ColumnChart(
+	             document.getElementById('TopHealthcare_div'));
+				 
+	chart.draw(data, options);
+	}	
+	//Heathcare spending of top 10 Countries for 6 years of data using stack chart
+	function TopHealthStackResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 6, desc: true});
+			
+			var options = {
+					width: 600,
+					height: 400,
+					title: 'Top 10 Countries with highest  Healthcare spending from 2010 to 2015 in USD (billions)',
+					vAxis: {title: 'Country'},
+				    hAxis: {title: 'Spending in Billions ($)'},
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+					isStacked: true
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('TopHealthStack_div'));
+			chart.draw(data, options);
+			
+			}
+	//function end
+	
+		  // Geo map showing top countries Healthcare spending
+	  function HealthGeoResponseHandler(response) {
+           checkError(response);
+		   var data = response.getDataTable();
+          data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+		
+		colorAxis: {colors: ['#661ad8','#05c14d']}, 
+		title: 'Top 10 Countries by Healthcare total Spending in 2015 (USD Billions $)'
+		
+		};
+
+        var chart = new google.visualization.GeoChart(
+		document.getElementById('HealthGeo_div'));
+		chart.draw(data, options);
+      }
+	  //function end
+	  
+	    //Pie chart showing top countries in Healthcare spending
+	  function HealthPieResponseHandler(response) {
+	   checkError(response);
+		   var data = response.getDataTable();
+          //data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+		title: 'Top 10 Countries by Healthcare  Spending in 2015 (US Billions $)'
+		
+		};
+
+        var chart = new google.visualization.PieChart(
+		document.getElementById('HealthPie_div'));
+		chart.draw(data, options);
+      }
+	  
+	  // Scatter chart for Healthcare vs GDP spending
+		
+		function CompareTrendHealthGDPResponseHandler(response) {
+		checkError(response);
+		var data = response.getDataTable();
+		 var options = {
+         title: 'Healthcare Spending vs. Total GDP in Billions ($) (year 2015)',
+         hAxis: {title: 'Healthcare billions (USD)'},
+         vAxis: {title: 'GDP billions (USD)'},
+		 colors: ['#FF0000','#008000'],
+         legend: 'none' 
+		 };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('ScatterHealth_div'));
+        chart.draw(data, options);
+         }
+		 
+		  // Comparing Healthcare data in billions to country's gdp in billions for the year 2015
+	    function CompareHealthcareGDPResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			
+			var options = {
+				height: 400,
+				legend: 'none',
+				bars: 'horizontal',
+				colors : ['#efe304','#049cef'],
+				isStacked: true,
+				annotations: {alwaysOutside: true},
+				title: 'Bar chart representation of the Healthcare Spending vs Total GDP in billions ($)(year 2015)',
+				vAxis: {title: 'Country'},
+				hAxis: {title: 'Spending in Billions USD ($)'}
+			};
+			
+			var chart = new google.visualization.BarChart(
+				document.getElementById('HealthcareGDP_div'));
+		
+			chart.draw(data, options);
+		} //
+		
+		// Comparing HealthCare spending in billions to Country's Military spending in billions for the year 2015
+		function CompareHealthMilitaryResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			
+			var options = {
+				height: 400,
+				legend: 'none',
+				bars: 'horizontal',
+				colors : ['#049cef','#efe304'],
+				isStacked: true,
+				annotations: {alwaysOutside: true},
+				title: 'Bar chart representation of the Healthcare Spending vs Military spending in billions($)(year 2015)',
+				vAxis: {title: 'Country'},
+				hAxis: {title: 'Spending in Billions USD ($)'}
+			};
+			
+			var chart = new google.visualization.BarChart(
+				document.getElementById('HealthMilitary_div'));
+		
+			chart.draw(data, options);
+		} //
+		
+			//Comparing the per person Healthcare  spending to the per person GDP
+		function ComparePercapitaHealthGdpResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			var options = {
+			        title: 'Barchart Representation Of The Per Person Healthcare Spending To Per Person GDP year 2015 in USD',
+					width: 600,
+					height: 400,
+					colors: [ '#4cb224', '#e01653'],
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+				
+					isStacked: true
+					
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('PercapitaHealth10Gdp_div'));
+			chart.draw(data, options);
+		
+		}
+			//Linechart for fastest growing country in terms of health care in fixed value	
+		
+		function FastestHealthFixedValueResponseHandler(response) {
+		
+		  
+		var data = response.getDataTable();
+	    data.sort({column: 0, desc: false});
+	    var view = new google.visualization.DataView(data);
+     
+       var options = {
+	              vAxis:{title:'GDP'},
+				  hAxis:{title:'Healthcare spending in fixed value billions: USD($)'},
+			      minColor: '#f00',
+                  midColor: '#ddd',
+                  maxColor: '#0d0',
+                  headerHeight: 15,
+                  fontColor: 'black',
+                  showScale: true
+                     };
+					 
+			   var  chart = new google.visualization.LineChart(
+					document.getElementById('HealthFixedValue_div'));
+					
+			   chart.draw(data, options);
+		}			
+
+
+     //Linechart for fastest growing country in terms of health care in percent value
+       function  FastestHealthPercentValueResponseHandler(response)	{
+		var data = response.getDataTable();
+	    data.sort({column: 0, desc: false});
+	    var view = new google.visualization.DataView(data);
+     
+       var options = {
+	              vAxis:{title:'GDP'},
+				  hAxis:{title:'Healthcare spending in percent'},
+			    //  minColor: '#f00',
+                 // midColor: '#ddd',
+                  maxColor: '#0d0',
+                  headerHeight: 15,
+                  fontColor: 'black',
+                  showScale: true
+                     };
+					 
+			   var  chart = new google.visualization.LineChart(
+					document.getElementById('HealthPercentValue_div'));
+					
+			   chart.draw(data, options);
+		}			
+		  
+		  
+		 
+</script>
+</head>
+
+<body>
+      <div id="header">
+         <div id="logo">
+            <div id="logo_text">
+             <h1>Analysis of Health</br>Spending</h1>
+            </div> <!-- logo_text -->
+         </div><!-- logo -->
+         <div id="menubar">
+            <ul id="menu">
+               <li><a href="index.html">Home</a></li>
+               <li><a href="Education.html">Education</a></li>
+               <li class="selected"><a href="healthcare.html">Healthcare</a></li>
+               <li><a href="military.html">military</a></li>
+            </ul><!-- menu -->
+         </div><!-- menubar -->
+      </div><!-- header -->
+
+          <!-- Bootstrap grid setup -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+			     <h3>Introduction</h3>
+                  Level of current health expenditure expressed as a percentage of GDP. Estimates of current health expenditures<br> 
+				  include healthcare goods and services consumed during each year. This indicator does not include capital health<br> 
+				  expenditures such as buildings, machinery, IT and stocks of vaccines for emergency or outbreaks.<br>
+               </div>
+            </div>
+        </div>
+        </p>
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+                  <h3>High-level View of the Data</h3>
+                  The following chart shows the trend of helathcare spending in US seems to be gradually increased from 2010 to 2015 <br>
+				  from 2543 billions to 3106 billions. Japan was in second place in healthcare spending from 2010-2012 but China seems<br>
+				  to be leading from 2012-2015. Russia is the least spending country.<br>
+				  
+			 </div>
+            </div>
+        </div>
+	<table> <tr>
+	<h3> Requirement 1: The Healthcare Spending Of The Top 10 Nations </h3>
+	<br></br>
+	<b>  Column Chart Representation Of Top 10 Healthcare Spending Countries From 2010-2015 </b>
+	<td><div id ="TopHealthcare_div" style="width:800px; height:600px"></div></td>
+	</tr> </table>
+	
+	<table> <tr>
+		<b> Stacked Chart Representation Of Top 10 Healthcare Spending Countries From 2010-2015</b>
+		 <td><div  id ="TopHealthStack_div" style="width:900px; height:600px"></div></td>
+	 </tr></table>
+	
+	<table><tr>
+	<b> Geo Map Representation Of Top 10 Healthcare Spending Countries For The Year 2015 </b>
+	<td> <div  id ="HealthGeo_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	
+	<table><tr>
+	<b> Pie Chart Representation Of Top 10 Healthcare Spending Countries For The Year 2015 </b>
+	  <td> <div  id ="HealthPie_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	
+	<table> <tr>
+	<h3> Requirement 2: Compare The Spending Data To That Country’s GDP </h3>
+	 <b>Comparing The Healthcare Spending To The Overall GDP Of The Country Using Scatter Charts</b>
+	 <td><div id ="ScatterHealth_div" style="width: 900px;height:500px"></div></td>
+	</tr>
+	</table>
+	
+	<table><tr>
+	 <td><div id ="HealthcareGDP_div" style="width: 900px;height:500px"></div></td>
+	</tr>
+	</table>
+	
+	<table> <tr>
+	  <<h3>Requirement 3: Compare Healthcare Spending To The Overall Military Spending Of That Country</h3>
+	    <td> <div id ="HealthMilitary_div" style ="width: 900px;height:400px"></div></td>
+	   </tr>
+	  </table>
+	  
+	  <table> <tr>
+	  <h3>Requirement 4: Compare the per person Healthcare spending to per person GDP</h3>
+	 <td>  <div id="PercapitaHealth10Gdp_div"  style="width:1000px; height:500px"></div></td>
+	</tr> 
+	</table>
+	
+	<h3> Requirement 5: Single Out The Fastest Growing Countries In Healthcare Spending In Fixed Value And Percentage </h3>
+	 <table> <tr>
+	 <b> Fastest Growing Countries In Terms Of Fixed Value And Percentage For Healthcare</b> 
+	
+	 <td> <div  id ="HealthFixedValue_div" style="width:700px; height:500px"></div> </td>
+		 <td> <div  id ="HealthPercentValue_div" style="width:700px; height:500px"></div> </td> 
+	</tr> 
+	</table>
+	  
+
+</body>
+</html>

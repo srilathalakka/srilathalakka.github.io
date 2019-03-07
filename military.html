@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+     <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- D3 tip CSS -->
+    <link rel="stylesheet" href="css/d3-tip.css">
+
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/military.css">
+		<script type = "text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type = "text/javascript">
+	/* The purpose of this project is to learn about data Visualization and present information in visual manners
+	
+	*/
+	
+	google.charts.load('current' ,{'packages' : ['corechart']});
+	google.charts.setOnLoadCallback(drawAllSheets);
+	
+	function drawAllSheets() {
+		drawSheetName('Top10Military','SELECT A,B,C,D,E,F,G',
+	                 TopMilitaryResponseHandler);	
+		drawSheetName('Top10Military', 'SELECT A,B,C,D,E,F,G',
+	                   TopMilitaryStackResponseHandler);
+		drawSheetName('Top10Military','SELECT A,G',
+	                 MilitaryGeoResponseHandler);	
+		drawSheetName('Top10Military', 'SELECT A,G',
+                      MilitaryPieResponseHandler);	
+		drawSheetName('PercapitaMilitary10Gdp', 'SELECT A,B,C,D,E,F,G',
+	                     ComparePercapitaMilitaryGdpResponseHandler);
+	}
+	function drawSheetName(sheetName, query, responseHandler) {
+	var queryString = encodeURIComponent(query);
+	var query = new google.visualization.Query(
+              'https://docs.google.com/spreadsheets/d/1vkzDvA31IR-nHbgvUhIoSVqfih_9XhFYCbRVXduMcKA/gviz/tq?sheet='
+			   + sheetName + '&headers=1&tq=' + queryString);
+	       query.send(responseHandler);
+	}
+	
+	function checkError(response) {
+	if(response.isError()) {
+	alert('Error in query: '+ response.getMessage() +
+	' ' + response.getDetailedMessage());
+	return;
+	}
+	}
+	//Function end
+		//Health care spending of top 10 Countries for 6 years of data using column chart
+function TopMilitaryResponseHandler(response) {
+	
+     checkError(response);
+	 var data = response.getDataTable();
+	 data.sort({column:6, desc:true});
+	 
+	 var options ={
+	 title :' Top 10 Countries with highest Military spending',
+	  height: 500,
+	  vAxis: {title: 'Spending in Billions USD ($)'},
+	  hAxis: {title:  'Country'}
+	 
+	 };
+	 
+	 var chart = new google.visualization.ColumnChart(
+	             document.getElementById('TopMilitary_div'));
+				 
+	chart.draw(data, options);
+	}	
+	//Heathcare spending of top 10 Countries for 6 years of data using stack chart
+	function TopMilitaryStackResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 6, desc: true});
+			
+			var options = {
+					width: 600,
+					height: 400,
+					title: 'Top 10 Countries with highest  Military spending from 2010 to 2015 in USD (billions)',
+					vAxis: {title: 'Country'},
+				    hAxis: {title: 'Spending in Billions ($)'},
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+					isStacked: true
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('TopMilitaryStack_div'));
+			chart.draw(data, options);
+			
+			}
+	//function end
+	
+		  // Geo map showing top countries Military spending
+	  function MilitaryGeoResponseHandler(response) {
+           checkError(response);
+		   var data = response.getDataTable();
+          data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+		
+		colorAxis: {colors: ['#FFC0CB','#C71585']}, 
+		title: 'Top 10 Countries by Military total Spending in 2015 (USD Billions $)'
+		
+		};
+
+        var chart = new google.visualization.GeoChart(
+		document.getElementById('MilitaryGeo_div'));
+		chart.draw(data, options);
+      }
+	  //function end
+	  
+	    //Pie chart showing top countries in Healthcare spending
+	  function MilitaryPieResponseHandler(response) {
+	   checkError(response);
+		   var data = response.getDataTable();
+          //data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+		title: 'Top 10 Countries by Military  Spending in 2015 (US Billions $)'
+		
+		};
+
+        var chart = new google.visualization.PieChart(
+		document.getElementById('MilitaryPie_div'));
+		chart.draw(data, options);
+      }
+	  	//Comparing the per person Military spending to the per person GDP
+		function ComparePercapitaMilitaryGdpResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			var options = {
+			        title: 'Barchart Representation Of The Per Person Military Spending To Per Person GDP year 2015 in USD',
+					width: 600,
+					height: 400,
+					colors: [ '#4cb224', '#e01653'],
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+				
+					isStacked: true
+					
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('PercapitaMilitary10Gdp_div'));
+			chart.draw(data, options);
+		
+		}
+</script>
+</head>
+
+
+<body>
+      <div id="header">
+         <div id="logo">
+            <div id="logo_text">
+             <h1>Analysis of Military</br>Spending</h1>
+            </div> <!-- logo_text -->
+         </div><!-- logo -->
+         <div id="menubar">
+            <ul id="menu">
+               <li><a href="index.html">Home</a></li>
+               <li><a href="Education.html">Education</a></li>
+               <li><a href="healthcare.html">HealthCare</a></li>
+               <li class="selected"><a href="military.html">Military</a></li>
+            </ul><!-- menu -->
+         </div><!-- menubar -->
+      </div><!-- header -->
+
+     <!-- Bootstrap grid setup -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+			     <h3>Introduction</h3>
+                  National defense is an important function of government and security from external threats that contributes to economic development,high<br>
+				  military expenditures for defense or civil conflicts burden the economy and may impede growth. Data on military expenditures as a share  <br>
+				  of gross domestic product (GDP) are a rough indicator of the portion of national resources used for military activities and of the burden<br> 
+				  on the economy. Data on military expenditures as a share of gross domestic product (GDP) are a rough indicator of the portion of national<br> 
+				  resources used for military activities and of the burden on the economy. As an "input" measure military expenditures are not directly related<br>  
+				  to the "output" of military activities, capabilities, or security. Comparisons of military spending among countries should take into account <br> 
+				  the many factors that influence perceptions of vulnerability and risk, including historical and cultural traditions, the length of borders  <br> 
+				  that need defending, the quality of relations with neighbors, and the role of the armed forces in the body politic<br>
+               </div>
+            </div>
+        </div>
+        </p>
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+                  <h3>High-level View of the Data</h3>
+                  The following chart shows the trend of Military spending in USA seems to be gradually increased from 2010 to 2012 from 724 billions to 740 billions <br> 
+				  and then started to decrease from 2013 to 2015. China seems to be in second place in military spending and Italy is the least spending country in <br>
+				  terms of military.<br>
+				  
+			 </div>
+            </div>
+        </div>
+	<table> <tr>
+	<h3> Requirement 1: The Military Spending Of The Top 10 Nations </h3>
+	<br></br>
+	<b>  Column Chart Representation of Top 10 Military Spending Countries from 2010-2015</b>
+	<td><div id ="TopMilitary_div" style="width:800px; height:600px"></div></td>
+	</tr> </table>
+	
+	<table> <tr>
+		<b> Stacked Chart Representation of of Top 10 Military Spending Countries from 2010-2015</b>
+		 <td><div  id ="TopMilitaryStack_div" style="width:900px; height:600px"></div></td>
+	 </tr></table>
+	
+	<table><tr>
+	<b> Geo Map representation of Top 10 Military spending Countries for the year 2015</b>
+	<td> <div  id ="MilitaryGeo_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	
+	<table><tr>
+	<b> Pie Chart Representation of Top 10 Military Spending Countries for the year 2015</b>
+	  <td> <div  id ="MilitaryPie_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	
+	<table> <tr>
+	 <h3>Requirement 6: Compare the per person Military spending to per person GDP</h3>
+	 <td>  <div id="PercapitaMilitary10Gdp_div"  style="width:1000px; height:500px"></div></td>
+	</tr> 
+	</table>
+
+</body>
+</html>
+
+
+
+
+
+
+

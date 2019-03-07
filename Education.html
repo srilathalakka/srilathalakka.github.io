@@ -1,0 +1,400 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- D3 tip CSS -->
+    <link rel="stylesheet" href="css/d3-tip.css">
+
+    <!-- Custom styling -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/education.css">
+	<script type = "text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type = "text/javascript">
+	/* The purpose of this project is to learn about data Visualization and present information in visual manners
+	
+	*/
+	
+	google.charts.load('current' ,{'packages' : ['corechart']});
+	google.charts.setOnLoadCallback(drawAllSheets);
+	
+	function drawAllSheets() {
+		drawSheetName('Top10Education','SELECT A,B,C,D,E,F,G',
+	                 TopEducationResponseHandler);
+		drawSheetName('Top10Education', 'SELECT A,B,C,D,E,F,G',
+	                   TopEducationStackResponseHandler);
+        drawSheetName('Top10Education', 'SELECT A,G',
+	                   TopEducationGeoResponseHandler);	
+        drawSheetName('Top10Education','SELECT A,G',
+                   EducationPieResponseHandler);
+		drawSheetName('Education10GDP' ,'SELECT A,G,P',
+                        CompareTrendEducationGDPResponseHandler);	
+		drawSheetName('Education10GDP', 'SELECT A,G,P',
+	                     CompareEducationGDPResponseHandler);	
+		drawSheetName('EducationMilitary10', 'SELECT A,G,Q',
+	                     CompareEducationMilitaryResponseHandler);
+		drawSheetName('PercapitaEducationGdp', 'SELECT A,G,AC',
+	                     ComparePercapitaEducationGdpResponseHandler);
+		drawSheetName('FastEducation','SELECT A,B,C,D,E,F,G,H,I,J,K',
+	              FastestEducationFixedValueResponseHandler);
+		drawSheetName('FastEducation',' SELECT M,N,O,P,Q,R,S,T,U,V,W',
+	               FastestEducationPercentValueResponseHandler);
+
+	}					 
+
+	function drawSheetName(sheetName, query, responseHandler) {
+	var queryString = encodeURIComponent(query);
+	var query = new google.visualization.Query(
+              'https://docs.google.com/spreadsheets/d/1vkzDvA31IR-nHbgvUhIoSVqfih_9XhFYCbRVXduMcKA/gviz/tq?sheet='
+			   + sheetName + '&headers=1&tq=' + queryString);
+	       query.send(responseHandler);
+	}
+	
+	function checkError(response) {
+	if(response.isError()) {
+	alert('Error in query: '+ response.getMessage() +
+	' ' + response.getDetailedMessage());
+	return;
+	}
+	}
+	//Function end
+ 
+		
+	//Education spending of the top 10 nations for 6 years of data  using column chart
+	function TopEducationResponseHandler(response) {
+	
+     checkError(response);
+	 var data = response.getDataTable();
+	 data.sort({column:6, desc:true});
+	 
+	 var options ={
+	 title:'Top 10 nations with highest Educational spending',
+	   vAxis: {title: 'Spending in Billions USD ($)'},
+	  hAxis: {title:  'Country'},
+	 height: 500
+	 
+	 };
+	 
+	 var chart = new google.visualization.ColumnChart(
+	             document.getElementById('TopEducation_div'));
+				 
+	chart.draw(data, options);
+	}
+	//Education spending of top 10 nations for 6 years of data using stack chart
+		function TopEducationStackResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 6, desc: true});
+			
+			var options = {
+					width: 600,
+					height: 400,
+					title:'Top 10 nations with the highest Educational spending from 2010 to 2015 in USD(billions)',
+					vAxis: {title: 'Country'},
+				    hAxis: {title: 'Spending in Billions ($)'},
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+					isStacked: true
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('TopEducationStack_div'));
+			chart.draw(data, options);
+			
+			}
+	//function end
+	
+	  // Geo map showing top countries Education spending
+		  function TopEducationGeoResponseHandler(response) {
+           checkError(response);
+		   var data = response.getDataTable();
+          data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+	
+		colorAxis: {colors: ['#FFA07A','#FF4500']}, 
+		title: 'Top 10 nations with the highest Educational spending from 2010 to 2015 in USD(billions)',
+		
+		};
+
+        var chart = new google.visualization.GeoChart(
+		document.getElementById('EducationGeo_div'));
+		chart.draw(data, options);
+      } 
+	//function end
+	
+		  // Pie chart showing top countries in Educational Spending
+	   function EducationPieResponseHandler(response) {
+	   checkError(response);
+		   var data = response.getDataTable();
+         // data.sort({column:1, desc:true});
+
+        var options = {
+		height :400,
+		title: 'Top 10 Countries by Educational  Spending in 2015 (US Billions $)'
+		
+		};
+
+        var chart = new google.visualization.PieChart(
+		document.getElementById('EducationPie_div'));
+		chart.draw(data, options);
+      }
+ // Function end
+ 
+   // Scatter chart for Education vs GDP spending
+		
+		function CompareTrendEducationGDPResponseHandler(response) {
+		checkError(response);
+		var data = response.getDataTable();
+		 var options = {
+         title: 'Education Spending vs. Total GDP in Billions ($) (year 2015)',
+         hAxis: {title: 'Education billions (USD)'},
+         vAxis: {title: 'GDP billions (USD)'},
+		 colors: ['#FF0000','#008000'],
+         legend: 'none' 
+		 };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('ScatterEducation_div'));
+        chart.draw(data, options);
+         }
+		 
+		  // Comparing Education data in billions to country's gdp in billions for the year 2015
+	    function CompareEducationGDPResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			
+			var options = {
+				height: 400,
+				legend: 'none',
+				bars: 'horizontal',
+				colors : ['#efe304','#049cef'],
+				isStacked: true,
+				annotations: {alwaysOutside: true},
+				title: 'Bar chart representation of the Education Spending vs Total GDP in billions ($)(year 2015)',
+				vAxis: {title: 'Country'},
+				hAxis: {title: 'Spending in Billions USD ($)'}
+			};
+			
+			var chart = new google.visualization.BarChart(
+				document.getElementById('EducationGDP_div'));
+		
+			chart.draw(data, options);
+		} //
+		
+		// Comparing Education spending in billions to Country's Military spending in billions for the year 2015
+		function CompareEducationMilitaryResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			
+			var options = {
+				height: 400,
+				legend: 'none',
+				bars: 'horizontal',
+				colors : ['#049cef','#efe304'],
+				isStacked: true,
+				annotations: {alwaysOutside: true},
+				title: 'Bar chart representation of the Education Spending vs Military spending in billions($)(year 2015)',
+				vAxis: {title: 'Country'},
+				hAxis: {title: 'Spending in Billions USD ($)'}
+			};
+			
+			var chart = new google.visualization.BarChart(
+				document.getElementById('EducationMilitary_div'));
+		
+			chart.draw(data, options);
+		} //
+		
+			//Comparing the per person Education  spending to the per person GDP
+		function ComparePercapitaEducationGdpResponseHandler(response) {
+			checkError(response);
+			var data = response.getDataTable();
+			data.sort({column: 1, desc: true});
+			var options = {
+			        title: 'Barchart Representation Of The Per Person Education Spending To Per Person GDP year 2015 in USD',
+					width: 600,
+					height: 400,
+					colors: [ '#4cb224', '#e01653'],
+					legend: {position: 'top', maxLines: 3},
+					bar: {groupWidth: '75%'},
+				
+					isStacked: true
+					
+			};
+			
+			var chart = new google.visualization.BarChart(
+					document.getElementById('PercapitaEducation10Gdp_div'));
+			chart.draw(data, options);
+		
+		}
+			//Linechart for fastest growing country in terms of Education in fixed value	
+		
+		function FastestEducationFixedValueResponseHandler(response) {
+		
+		  
+		var data = response.getDataTable();
+	    data.sort({column: 0, desc: false});
+	    var view = new google.visualization.DataView(data);
+     
+       var options = {
+	              vAxis:{title:'GDP'},
+				  hAxis:{title:'Education spending in fixed value billions: USD($)'},
+			      minColor: '#f00',
+                  midColor: '#ddd',
+                  maxColor: '#0d0',
+                  headerHeight: 15,
+                  fontColor: 'black',
+                  showScale: true
+                     };
+					 
+			   var  chart = new google.visualization.LineChart(
+					document.getElementById('EducationFixedValue_div'));
+					
+			   chart.draw(data, options);
+		}			
+
+
+     //Linechart for fastest growing country in terms of Education care in percent value
+       function  FastestEducationPercentValueResponseHandler(response)	{
+		var data = response.getDataTable();
+	    data.sort({column: 0, desc: false});
+	    var view = new google.visualization.DataView(data);
+     
+       var options = {
+	              vAxis:{title:'GDP'},
+				  hAxis:{title:'Education spending in percent'},
+			    //  minColor: '#f00',
+                 // midColor: '#ddd',
+                  maxColor: '#0d0',
+                  headerHeight: 15,
+                  fontColor: 'black',
+                  showScale: true
+                     };
+					 
+			   var  chart = new google.visualization.LineChart(
+					document.getElementById('EducationPercentValue_div'));
+					
+			   chart.draw(data, options);
+		}			
+		  
+	
+	
+	</script>
+
+</head>
+
+<body>
+      <div id="header">
+         <div id="logo">
+            <div id="logo_text">
+            <h1>Analysis of Education </br> Spending</h1>
+            </div> <!-- logo_text -->
+         </div><!-- logo -->
+         <div id="menubar">
+            <ul id="menu">
+               <li><a href="index.html">Home</a></li>
+               <li class="selected"><a href="Education.html">Education</a></li>
+               <li><a href="healthcare.html">Healthcare</a></li>
+               <li><a href="military.html">Military</a></li>
+            </ul><!-- menu -->
+         </div><!-- menubar -->
+      </div><!-- header -->
+
+          <!-- Bootstrap grid setup -->
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+			     <h3>Introduction</h3>
+                  The percentage of government expenditure on education to GDP is useful to compare education expenditure <br>
+				  between countries and/or over time in relation to the size of their economy; A high percentage to GDP suggests<br>
+				  a high priority for education and a capacity of raising revenues for public spending. Note that government<br> 
+				  expenditure appears lower in some countries where the private sector and/or households have a large share in<br> 
+				  total funding for education.
+               </div>
+            </div>
+        </div>
+        </p>
+        <div class="row">
+            <div class="col-md-12">
+               <div id="content">
+                  <h3>High-level View of the Data</h3>
+                  The following chart shows the trend of educational spending in US seems to be increased from 2010 to 2013 and <br>
+				  decreased about 11 billions in 2014 and then raised back in 2015 to 975 billions. The least spending country seems<br>
+				  to be Mexico.
+			 </div>
+            </div>
+        </div>
+	<table> <tr>
+	<h3> Requirement 1: The Education Spending Of The Top 10 Nations </h3>
+	<br></br>
+	<b>  Column Chart Representation of Top 10 Educational Spending Countries from 2010-2015 </b>
+	<td><div id ="TopEducation_div" style="width:800px; height:600px"></div></td>
+	</tr> </table>
+	
+	<table> <tr>
+		<b> Stacked Chart Representation of of Top 10 Educational Spending Countries from 2010-2015   </b>
+		 <td><div  id ="TopEducationStack_div" style="width:900px; height:600px"></div></td>
+	 </tr></table>
+	
+	<table><tr>
+	<b> Geo Map representation of Top 10 Educational spending Countries for the year 2015 </b>
+	<td> <div  id ="EducationGeo_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	
+	<table><tr>
+	<b> Pie Chart Representation of Top 10 Educational Spending Countries for the year 2015 </b>
+	  <td> <div  id ="EducationPie_div" style="width:900px; height:500px"></div> </td>
+	</tr> </table>
+	<table> <tr>
+	<h3> Requirement 2: Compare The Spending Data To That Country’s GDP </h3>
+	 <b>Comparing The Education Spending To The Overall GDP Of The Country Using Scatter Charts</b>
+	 <td><div id ="ScatterEducation_div" style="width: 900px;height:500px"></div></td>
+	</tr>
+	</table>
+	
+	<table><tr>
+	 <td><div id ="EducationGDP_div" style="width: 900px;height:500px"></div></td>
+	</tr>
+	</table>
+	
+	<table> <tr>
+	  <<h3>Requirement 3: Compare Education Spending To The Overall Military Spending Of That Country</h3>
+	    <td> <div id ="EducationMilitary_div" style ="width: 900px;height:400px"></div></td>
+	   </tr>
+	  </table>
+	  
+	  <table> <tr>
+	  <h3>Requirement 4: Compare The Per Person Education Spending To Per Person GDP</h3>
+	 <td>  <div id="PercapitaEducation10Gdp_div"  style="width:1000px; height:500px"></div></td>
+	</tr> 
+	</table>
+	
+	<h3> Requirement 5: Single Out The Fastest Growing Countries In Education Spending In Fixed Value And Percentage </h3>
+	 <table> <tr>
+	 <b> Fastest Growing Countries In Terms Of Fixed Value And Percentage For Education</b> 
+	
+	 <td> <div  id ="EducationFixedValue_div" style="width:700px; height:500px"></div> </td>
+		 <td> <div  id ="EducationPercentValue_div" style="width:700px; height:500px"></div> </td> 
+	</tr> 
+	</table>
+	  
+
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
